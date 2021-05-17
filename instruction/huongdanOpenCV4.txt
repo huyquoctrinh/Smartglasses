@@ -1,0 +1,56 @@
+Let’s start by downloading the already built OpenCV 4 
+from https://github.com/sol-prog/raspberry-pi-opencv/releases/
+As you can see, there are four binaries: two for RPi Zero with and without GUI support and two for RPi 2 
+and up with and without GUI support. Pick the proper version 
+for your RPi.
+
+sudo apt-get update
+sudo apt-get upgrade
+
+####TUY CHON###
+sudo apt full-upgrade
+###############
+
+wget https://github.com/sol-prog/raspberry-pi-opencv/releases/download/opencv4rpi2.1/opencv-4.1.0-armhf.tar.bz2
+tar xvf opencv-4.1.0-armhf.tar.bz2
+sudo mv opencv-4.1.0 /opt
+sudo apt install libtiff-dev zlib1g-dev
+sudo apt install libjpeg-dev libpng-dev
+sudo apt install libavcodec-dev libavformat-dev libswscale-dev libv4l-dev
+sudo apt-get install libxvidcore-dev libx264-dev
+sudo apt install python-numpy python3-numpy
+sudo apt install libgtk-3-dev libcanberra-gtk3-dev
+cd ~
+echo 'export LD_LIBRARY_PATH=/opt/opencv-4.1.0/lib:$LD_LIBRARY_PATH' >> .bashrc
+..bashrc
+sudo ln -s /opt/opencv-4.1.0/lib/python2.7/dist-packages/cv2 /usr/lib/python2.7/dist-packages/cv2
+sudo ln -s /opt/opencv-4.1.0/lib/python3.7/dist-packages/cv2 /usr/lib/python3/dist-packages/cv2
+sudo apt install git
+
+###Mo file ld.so.conf##
+
+sudo nano /etc/ld.so.conf
+
+####Them vao ####
+/opt/opencv-4.1.0/lib
+include /etc/ld.so.conf.d/*.conf
+
+####Load lai file ldconfig###
+sudo ldconfig
+
+
+########
+git clone https://gist.github.com/sol-prog/ed383474872958081985de733eaf352d opencv_cpp_compile_settings
+cd opencv_cpp_compile_settings/
+sudo cp opencv.pc /usr/lib/arm-linux-gnueabihf/pkgconfig
+cd ~
+rm -rf opencv_cpp_compile_settings/
+
+########
+git clone https://github.com/sol-prog/raspberry-pi-opencv.git
+cd raspberry-pi-opencv/tests
+python3 cli_python_test.py
+python3 gui_python_test.py
+
+
+
