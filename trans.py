@@ -7,7 +7,7 @@ def translate_text(text):
 	import six
 	from google.cloud import translate_v2 as translate
 	import os
-	os.environ["GOOGLE_APPLICATION_CREDENTIALS"]="./json_file/abc.json"
+	os.environ["GOOGLE_APPLICATION_CREDENTIALS"]="abc.json"
 	translate_client = translate.Client()
 
 	if isinstance(text, six.binary_type):

@@ -16,7 +16,7 @@ def assistant_speaks(output):
      #saving the audio file given by google text to speech 
     file = 'weather.mp3' 
     toSpeak.save(file)
-    os.system("omxplayer weather.mp3")
+    os.system("omxplayer -o alsa /home/pi/kinh/weather.mp3")
     #os.system('omxplayer file')  
     # playsound package is used to play the same file. 
     #pygame.mixer.music.load(file)
@@ -35,6 +35,6 @@ def weather_kt():
 	result="Hiện tại là ngày "+str(x)+" tháng "+str(t)+" lúc "+str(y)+" giờ "+str(z)+" phút. "+"Thời tiết hiện tại ở Thành phố Hồ Chí Minh có " + result + " nhiệt độ là " + str(int(weatherData["main"]["temp"] // 10)) + " độ xê độ ẩm là " + str(int(weatherData["main"]["humidity"])) + " phần trăm"
 	# speech.save("quochuy.mp3") 
 	# os.system("quochuy.mp3")
-	print(result)
+	# print(result)
 	assistant_speaks(result)
 # weather_kt()

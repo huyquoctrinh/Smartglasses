@@ -17,7 +17,7 @@ def assistant_speaks(output):
      #saving the audio file given by google text to speech 
     file = 'cap.mp3' 
     toSpeak.save(file)
-    os.system("omxplayer sound.mp3")
+    os.system("omxplayer -o alsa cap.mp3")
     #os.system('omxplayer file')  
     # playsound package is used to play the same file. 
     #pygame.mixer.music.load(file)
@@ -47,6 +47,5 @@ def caption():
     res=str(a)+' and '+str(b)+' and '+str(c)
     vn=translate_text(res)
     print(vn)
-    # assistant_speaks(vn)
+    assistant_speaks(vn)
     return vn
-caption()

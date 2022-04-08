@@ -1,90 +1,23 @@
-# import serial
-# import pygame
 from time import sleep
 
 # ser = serial.Serial("/dev/ttyUSB0", 9600)
 
-import cv2, os
+import os
 from time import sleep
 # from script import get_audio, assistant_speaks
 from google.cloud import vision
 import speech_recognition as sr  
+from google.cloud.vision import types
 #import playsound # to play saved mp3 file 
 from gtts import gTTS # google text to speech 
 import os # to save/open files 
-# import wolframalpha # to calculate strings into formula 
-# from selenium import webdriver # to control browser operations 
+from tien import detect_money
 import subprocess
 from subprocess import call
 from weather import weather_kt
-# from googletrans import Translator
-# pygame.init()
-# trans= Translator()
-os.environ["GOOGLE_APPLICATION_CREDENTIALS"]="/kinh/json_file/abc.json"
+os.environ["GOOGLE_APPLICATION_CREDENTIALS"]="abc.json"
 client = vision.ImageAnnotatorClient()
 num = 0
-s1 = u'ÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚÝàáâãèéêìíòóôõùúýĂăĐđĨĩŨũƠơƯưẠạẢảẤấẦầẨẩẪẫẬậẮắẰằẲẳẴẵẶặẸẹẺẻẼẽẾếỀềỂểỄễỆệỈỉỊịỌọỎỏỐốỒồỔổỖỗỘộỚớỜờỞởỠỡỢợỤụỦủỨứỪừỬửỮữỰựỲỳỴỵỶỷỸỹ'
-s0 = u'AAAAEEEIIOOOOUUYaaaaeeeiioooouuyAaDdIiUuOoUuAaAaAaAaAaAaAaAaAaAaAaAaEeEeEeEeEeEeEeEeIiIiOoOoOoOoOoOoOoOoOoOoOoOoUuUuUuUuUuUuUuYyYyYyYy'
-def remove_accents(input_str):
-    s = ''
-    for c in input_str:
-        if (c in s1): s += s0[s1.index(c)]
-        else: s += c
-    return s
-
-def detect_text(path):
-    from google.cloud import vision
-    import io
-    client = vision.ImageAnnotatorClient()
-    with io.open(path, 'rb') as image_file:
-        content = image_file.read()
-    image = vision.Image(content=content)
-    response = client.text_detection(image=image)
-    texts = response.text_annotations
-    s = ""
-    for text in texts:
-        s += text.description.replace("\n", " ").replace("  ", " ") + " "
-    if response.error.message:
-        raise Exception(
-            '{}\nFor more info on error messages, check: '
-            'https://cloud.google.com/apis/design/errors'.format(
-                response.error.message))
-    s = remove_accents(s).lower()
-    if ("mot nghin" in s.lower()): return "một nghìn"
-    if ("hai nghin" in s.lower()): return "hai nghìn"
-    if ("nam nghin" in s.lower()): return "năm nghìn"
-    if ("muoi nghin" in s.lower()): return "mười nghìn"
-    if ("hai muoi nghin" in s.lower()): return "hai mươi nghìn"
-    if ("nam muoi nghin" in s.lower()): return "năm mươi nghìn"
-    if ("mot tram nghin" in s.lower()): return "một trăm nghìn"
-    if ("hai tram nghin" in s.lower()): return "hai trăm nghìn"
-    if ("nam tram nghin" in s.lower()): return "năm trăm nghìn"
-    return("trong ảnh không có tiền 2")
-
-def detect_labels(path):
-    from google.cloud import vision
-    import io
-    client = vision.ImageAnnotatorClient()
-    with io.open(path, 'rb') as image_file:
-        content = image_file.read()
-    image = vision.Image(content=content)
-    response = client.label_detection(image=image)
-    labels = response.label_annotations
-    v = []
-    p = []
-    for label in labels:
-        v.append(label.description)
-        p.append(label.score)
-    #for i in range(len(v)): print(v[i], p[i])
-    if response.error.message:
-        raise Exception(
-            '{}\nFor more info on error messages, check: '
-            'https://cloud.google.com/apis/design/errors'.format(
-                response.error.message))
-    for i in range(len(v)):
-        if ("money" in v[i].lower()):
-            return(detect_text(path))
-    return("trong ảnh không có tiền 1")
 def process_text(input): 
     try: 
         if 'tìm' in input or 'kiếm' in input: 
@@ -165,11 +98,11 @@ def get_audio():
 def assistant_speaks(output): 
     toSpeak = gTTS(text = output, lang ='vi', slow = False) 
     # saving the audio file given by google text to speech 
-    file = "assist.mp3" 
+    file = "/home/pi/kinh/assist.mp3" 
     toSpeak.save(file)
-    os.system("omxplayer {}".format(file))
+    os.system("omxplayer -o alsa {}".format(file))
      
-    os.remove(file)
+    # os.remove(file)
   
 def get_audio(): 
   
@@ -214,7 +147,7 @@ def obj_detect():
     with open('/home/pi/image.jpg', 'rb') as image_file:
         content = image_file.read()
 
-    image = vision.Image(content=content)
+    image = types.Image(content=content)
     response = client.label_detection(image=image)
     labels = response.label_annotations
     print('Labels:')
@@ -242,7 +175,7 @@ def obj_detect():
 #     finally:
 #         ser.close()
 def ocr():
-	os.system("fswebcam -r 1280x720 --no-banner /home/pi/image.jpg")
+    os.system("fswebcam -r 1280x720 --no-banner /home/pi/image.jpg")
     # cam = cv2.VideoCapture(-1)
     # ret, image = cam.read()
 
@@ -259,18 +192,23 @@ def ocr():
     with io.open('/home/pi/image.jpg', 'rb') as image_file:
         content = image_file.read()
 
-    image = vision.Image(content=content)
+    image = types.Image(content=content)
 
     response = client.text_detection(image=image)
     texts = response.text_annotations
     print('Texts:')
-    if texts==[]:
-        assistant_speaks('không có chữ gì ở phía trước bạn')
-    else:
-        for text in texts:
-            sleep(3)
-            print('\n"{}"'.format(text.description))
-            assistant_speaks(text.description)
+    # if texts==[]:
+    #     assistant_speaks('không có chữ gì ở phía trước bạn')
+    # else:
+    k = 0
+    for text in texts:
+        k = 1
+        sleep(3)
+        print('\n"{}"'.format(text.description))
+        assistant_speaks(text.description)
+        break
+    if (k==0):
+        print("không có gì trước mắt bạn")
 def giongnoi():
     try:
             assistant_speaks("tôi có thể  giúp gì cho bạn ?")
